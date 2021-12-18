@@ -279,6 +279,9 @@ const controller =
             case 17: //ctrl
                 controller.crouch = keyState;
                 player.crouching = keyState;
+
+                if (player.dead) return;
+
                 if (!e.repeat)
                 {
                     player.pos.y += player.crouchHeight;
