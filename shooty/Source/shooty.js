@@ -8,11 +8,17 @@ function getRandomArbitrary(min, max)
     return Math.random() * (max - min) + min;
 }
 
-const ctx = document.getElementById("bckgCanvas").getContext("2d");
+const cnv = document.getElementById("bckgCanvas");
+const ctx = cnv.getContext("2d");
 const plr = document.getElementById("plr");
 
 ctx.canvas.width = 800;
 ctx.canvas.height = 600;
+
+const offset = ctx.canvas.width / 3;
+cnv.style.position = "absolute";
+cnv.style.left = String(offset) + "px";
+cnv.style.top = "10px";
 
 const res = { x: ctx.canvas.width, y: ctx.canvas.height };
 
@@ -52,7 +58,7 @@ const player =
 
     crouchHeight: playerDefaults.crouchHeight,
 
-    pos: { x: 0, y: res.y },
+    pos: { x: offset, y: res.y },
     vel: { x: 0, y: 0 },
 
     running: false,
@@ -67,6 +73,13 @@ const player =
 
 const levelCount = document.getElementById("level");
 const killCount = document.getElementById("kills");
+
+levelCount.style.position = "absolute";
+levelCount.style.left = String(offset + 10) + "px";
+
+killCount.style.position = "absolute";
+killCount.style.left = String(offset + 10) + "px";
+killCount.style.top = "25px";
 
 function UpdateKillCount()
 {
@@ -93,7 +106,7 @@ function EnemyConstructor(width, height, pos, vel, health, mag = 3, shotTics = 0
 function CreateEnemy()
 {
     const enemy = new EnemyConstructor(32, 48, 0, 0, 100);
-    enemy.pos = { x: getRandomArbitrary(128, res.x - 64), y: getRandomArbitrary(res.y - floorHeight * 4, res.y - enemy.height - floorHeight / 2) };
+    enemy.pos = { x: getRandomArbitrary(128 + offset, res.x - 64 + offset), y: getRandomArbitrary(res.y - floorHeight * 4, res.y - enemy.height - floorHeight / 2) };
 
     const enm = document.createElement("img");
     enm.src = "../Assets/Enemy/Shoot_1.png";;
@@ -150,7 +163,7 @@ function EnemyShoot()
     if (enemies[i].mag <= 0)
     {
         enemies[i].shotDelay = 60;
-        enemies[i].mag = getRandomArbitrary(1, 7);
+        enemies[i].mag = getRandomArbitrary(2, 7);
     }
 }
 
@@ -185,7 +198,7 @@ function UpdateBullets()
 {
     for (i = 0; i < bullets.length; i++)
     {
-        if (bullets[i].pos.x + bullets[i].vel > res.x - bullets[i].width * 4)
+        if (bullets[i].pos.x + bullets[i].vel > res.x - bullets[i].width * 4 + offset || bullets[i].pos.x - bullets[i].vel < offset + 10)
         {
             bullets.splice(i, 1);
 
@@ -358,7 +371,7 @@ function MovePlayer()
     }
     player.shotTics--;
 
-    if (player.pos.x + player.vel.x > res.x - player.width)
+    if (player.pos.x + player.vel.x > res.x - player.width + offset)
     {
         player.pos.x = 0;
         NextFrame();
@@ -377,7 +390,7 @@ function MovePlayer()
         }
     }
 
-    player.pos.x = clamp(player.pos.x, 8, res.x - player.width);
+    player.pos.x = clamp(player.pos.x, 10 + offset, res.x - player.width + offset);
     player.pos.y = clamp(player.pos.y, res.y - floorHeight * 4, res.y - player.height - floorHeight / 2);
 
     player.vel.x *= 0.7;
@@ -539,13 +552,14 @@ function AnimateEnemies()
 }
 
 const healthBars = document.getElementById("healthBars");
-healthBars.style.position = "absolute";
-healthBars.style.left = "0px";
-healthBars.style.top = "0px";
 const HealthBarsCtx = healthBars.getContext("2d");
 
-HealthBarsCtx.canvas.width = 800;
-HealthBarsCtx.canvas.height = 600;
+HealthBarsCtx.canvas.width = res.x;
+HealthBarsCtx.canvas.height = res.y;
+
+healthBars.style.position = "absolute";
+healthBars.style.left = String(offset) + "px";
+healthBars.style.top = cnv.style.top;
 
 const Tick = function()
 {
@@ -567,8 +581,16 @@ const DrawHealth = function()
 
     actors.forEach(actor =>
     {
-        HealthBarsCtx.fillStyle = "red";
-        HealthBarsCtx.fillRect(actor.pos.x, actor.pos.y - actor.height / 2, actor.health / 2, 10);
+        if (actor == player)
+        {
+            let crouchMult = player.crouching ? 2 : 1;
+            HealthBarsCtx.fillRect(actor.pos.x - offset, actor.pos.y - actor.height / 2 * crouchMult, actor.health / 2, 10);
+        }
+        else
+        {
+            HealthBarsCtx.fillStyle = "red";
+            HealthBarsCtx.fillRect(actor.pos.x - offset, actor.pos.y - actor.height / 2, actor.health / 2, 10);
+        }
     });
 
     window.requestAnimationFrame(DrawHealth);

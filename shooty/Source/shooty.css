@@ -1,4 +1,12 @@
-
+body
+{
+    background: radial-gradient(lightgray, gray);
+    background-size: 1920px 1080px;
+}
+#bckgCanvas
+{
+    border: 3px solid beige;
+}
 #plr
 {
     position: absolute;

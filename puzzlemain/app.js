@@ -2,6 +2,7 @@ const res = 3;
 const blocks = [];
 const pieces = [];
 
+let won = false;
 let cond = [];
 
 for (i = 0; i < res * res; i++)
@@ -20,13 +21,17 @@ for (i = 0, k = 1; i < res; i++)
     
     for (j = 0; j < res; j++)
     {  
-        const block = document.createElement("img");
+        const block = document.createElement("div");
 
         block.style.width = "128px";
         block.style.height = "128px";
         block.style.position = "absolute";
-        block.style.left = String(128 * j) + "px";
-        block.style.top = String(128 * i) + "px";
+        block.style.left = String(500 + 128 * j) + "px";
+        block.style.top = String(60 + 128 * i) + "px";
+        block.style.border = "2px solid black";
+
+        block.setAttribute("ondrop", "Drop_Handler(event)");
+        block.setAttribute("ondragover", "DragOver_Handler(event)");
 
         block.occupied = false;
         block.num = k;
@@ -43,21 +48,107 @@ newLine();
 for (i = 0; i < res * res + 1; i++)
 {
     const piece = document.createElement("img");
+    piece.id = String(i);
 
+    //TO DO: Randomize piece order
     piece.style.width = "128px";
     piece.style.height = "128px";
+    piece.style.marginLeft = "4px";
+    piece.style.marginTop = "4px";
     piece.src = "Assets/piece"+(i+1)+".png";
-    piece.style.position = "absolute";
-    piece.style.left = String(128 * i) + "px";
-    piece.style.top = "512px";
+
+    piece.draggable = true;
+    piece.setAttribute("ondragstart", "DragStart_Handler(event)");
+    piece.setAttribute("ondragend", "DragEnd_Handler(event)");
 
     piece.num = i + 1;
 
     pieces.push(piece);
-    document.body.appendChild(piece);
+    document.getElementById("imageBox").appendChild(piece);
 }
 
 let selectedBlock;
+
+function DragStart_Handler(ev)
+{
+    if (won) return;
+    
+    ev.dataTransfer.setData("text", ev.target.id);
+
+    ev.target.selected = true;
+    ev.target.style.border = "3px solid green";
+    selectedBlock = ev.target.block;
+
+    for (i = 0; i < pieces.length; i++)
+    {
+        if (pieces[i] != ev.target)
+        {
+            pieces[i].selected = false;
+            pieces[i].style.border = "";
+        }
+    }
+}
+
+function DragOver_Handler(ev)
+{
+    ev.preventDefault();
+}
+
+function Drop_Handler(ev)
+{
+    ev.preventDefault();
+    
+    blocks.forEach(block =>
+    {
+        if (block == selectedBlock && block != ev.target && !ev.currentTarget.occupied)
+        {
+            cond[block.num-1] = false;
+            block.occupied = false;
+            block.style.border = "2px solid black";
+        }
+    });
+    
+    pieces.forEach(piece =>
+    {
+        if (piece.selected && !ev.currentTarget.occupied)
+        {
+            if (ev.currentTarget.num != undefined)
+            {
+                ev.currentTarget.occupied = true;
+                ev.currentTarget.piece = piece;
+                piece.block = ev.currentTarget;
+                
+                if (piece.num == ev.currentTarget.num)
+                {
+                    cond[ev.currentTarget.num-1] = true;
+                    ev.currentTarget.style.border = "2px solid green";
+                }
+
+                piece.style.marginLeft = "";
+                piece.style.marginTop = "";
+            }
+            else
+            {
+                piece.style.marginLeft = "4px";
+                piece.style.marginTop = "4px";
+            }
+            
+            let id = ev.dataTransfer.getData("text");
+            ev.currentTarget.appendChild(document.getElementById(id));
+
+            piece.selected = false;
+
+            piece.style.border = "";   
+        }
+    });
+
+    CheckWin();
+}
+
+function DragEnd_Handler(ev)
+{
+    ev.dataTransfer.clearData();
+}
 
 pieces.forEach(piece =>
 {
@@ -78,46 +169,10 @@ pieces.forEach(piece =>
     });
 });
 
-blocks.forEach(curBlock =>
-{
-    curBlock.addEventListener("click", function()
-    {
-        blocks.forEach(block =>
-        {
-            if (block == selectedBlock && block != curBlock && !curBlock.occupied)
-            {
-                cond[block.num-1] = false;
-                block.occupied = false;
-            }
-        });
-
-        pieces.forEach(piece =>
-        {
-            if (piece.selected && !curBlock.occupied)
-            {
-                curBlock.occupied = true;
-                curBlock.piece = piece;
-                piece.block = curBlock;
-                
-                piece.style.left = curBlock.style.left;
-                piece.style.top = curBlock.style.top;
-                
-                if (piece.num == curBlock.num)
-                {
-                    cond[curBlock.num-1] = true;
-                }
-
-                piece.selected = false;
-                piece.style.border = "";
-            }
-        });
-
-        CheckWin();
-    });
-});
-
 function CheckWin()
 {
+    if (won) return;
+
     for (i = 0; i < cond.length; i++)
     {
         if (!cond[i])
@@ -129,9 +184,11 @@ function CheckWin()
     const p = document.createElement("p");
     const winText = document.createTextNode("You solved the puzzle!");
     p.style.position = "absolute";
-    p.style.left = "50%";
-    p.style.top = "50%";
+    p.style.left = "45%";
+    p.style.top = "75%";
     
     p.appendChild(winText);
     document.body.appendChild(p);
+
+    won = true;
 }
