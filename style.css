@@ -1,6 +1,6 @@
 .header {
     overflow: hidden;
-    background-color: #525151;
+    background: linear-gradient(lightgray, gray);
     padding: 20px 10px;
 }
 
@@ -9,7 +9,7 @@
 
 .header a {
     float: left;
-    color: black;
+    color: rgb(170, 201, 33)k;
     text-align: center;
     padding: 12px;
     text-decoration: none;
@@ -21,6 +21,9 @@
 .header a.logo {
     font-size: 25px;
     font-weight: bold;
+    background: -webkit-linear-gradient(red, yellow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .header-right {
@@ -60,7 +63,7 @@
 .start3 {
     width: 100px;
     height: 80px;
-    margin-left: 450px;
+    margin-left: 350px;
     background-color: #f50e0e;
 }
 
@@ -74,6 +77,14 @@
 .img2 {
     float: inline-end;
     width: 300px;
+    margin-top: 170px;
+    margin-left: 150px;
+}
+
+.img3 {
+    float: inline-end;
+    width: 300px;
+    height: 310px;
     margin-top: 170px;
     margin-left: 150px;
 }

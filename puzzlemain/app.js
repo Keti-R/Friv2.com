@@ -5,7 +5,7 @@ const pieces = [];
 let won = false;
 let cond = [];
 
-for (i = 0; i < res * res; i++)
+for (let i = 0; i < res * res; i++)
 {
     cond[i] = false;
 }
@@ -15,11 +15,11 @@ function newLine()
     document.body.appendChild(document.createElement("br"));
 }
 
-for (i = 0, k = 1; i < res; i++)
+for (let i = 0, k = 1; i < res; i++)
 {
     newLine();
     
-    for (j = 0; j < res; j++)
+    for (let j = 0; j < res; j++)
     {  
         const block = document.createElement("div");
 
@@ -45,23 +45,33 @@ for (i = 0, k = 1; i < res; i++)
 
 newLine();
 
-for (i = 0; i < res * res + 1; i++)
+let pieceNums = [ 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    ranNums = [],
+    i = pieceNums.length,
+    j = 0;
+
+while (i--) {
+    j = Math.floor(Math.random() * (i+1));
+    ranNums.push(pieceNums[j]);
+    pieceNums.splice(j,1);
+}
+
+for (i = 0; i < res * res; i++)
 {
     const piece = document.createElement("img");
-    piece.id = String(i);
+    piece.id = String(ranNums[i]);
 
-    //TO DO: Randomize piece order
     piece.style.width = "128px";
     piece.style.height = "128px";
     piece.style.marginLeft = "4px";
     piece.style.marginTop = "4px";
-    piece.src = "Assets/piece"+(i+1)+".png";
+    piece.src = "Assets/"+String(ranNums[i])+".png";
 
     piece.draggable = true;
     piece.setAttribute("ondragstart", "DragStart_Handler(event)");
     piece.setAttribute("ondragend", "DragEnd_Handler(event)");
 
-    piece.num = i + 1;
+    piece.num = ranNums[i];
 
     pieces.push(piece);
     document.getElementById("imageBox").appendChild(piece);

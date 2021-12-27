@@ -493,7 +493,7 @@ function AnimatePlayer()
             plr.src = "../Assets/Player/CrouchIdle_1.png";
         }
     }
-    else if (player.shotTics <= 10 && player.shotTics >= 6)
+    if (player.shotTics <= 10 && player.shotTics >= 6)
     {
         plr.src = "../Assets/Player/Shoot_1.png";
 

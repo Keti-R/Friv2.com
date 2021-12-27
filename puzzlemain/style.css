@@ -1,6 +1,7 @@
 body
 {
-    background-color: rgb(63, 63, 63);
+    background: linear-gradient(135deg, gray, black) no-repeat;
+    background-size: 100% 250%;
 }
 #imageBox
 {
@@ -8,4 +9,5 @@ body
     border: 4px solid beige;
     position: relative;
     top: 500px;
+    background: linear-gradient(90deg, black, gray, black)
 }
